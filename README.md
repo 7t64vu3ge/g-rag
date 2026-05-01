@@ -56,7 +56,9 @@ GDRIVE_FOLDER_ID=your_google_drive_folder_id_here
 
 Place your service account JSON file at the path specified in `GOOGLE_APPLICATION_CREDENTIALS` (default: `service_account.json`).
 
-The service account needs **Viewer** access to the target Google Drive folder.
+**IMPORTANT**: The service account needs **Viewer** access to your target Google Drive folder. 
+1. Copy the `client_email` from your JSON file.
+2. Go to your Google Drive folder, click **Share**, and invite that email as a **Viewer**.
 
 ### 4. Run the server
 
@@ -69,6 +71,14 @@ The API will be available at `http://localhost:8000`.
 Interactive docs: `http://localhost:8000/docs`
 
 ## API Endpoints
+
+### `GET /config`
+
+Returns the current configuration, including the service account email and target folder ID. Use this to verify setup.
+
+```bash
+curl http://localhost:8000/config
+```
 
 ### `POST /sync-drive`
 
@@ -133,7 +143,7 @@ POST /sync-drive
 POST /ask
   └── Embedder      →  embed query
         └── Retriever  →  top-5 FAISS search
-              └── Groq LLM  →  answer from context (llama3-8b-8192)
+              └── Groq LLM  →  answer from context (llama-3.3-70b-versatile)
                     └── Response  →  { answer, sources }
 ```
 
@@ -151,5 +161,5 @@ POST /ask
 - **SentenceTransformers** (`all-MiniLM-L6-v2`) — text embeddings
 - **FAISS** (`IndexFlatL2`) — vector similarity search
 - **PyMuPDF** — PDF text extraction
-- **Groq** (`llama3-8b-8192`) — LLM for answer generation
+- **Groq** (`llama-3.3-70b-versatile`) — LLM for answer generation
 - **Google Drive API** — document source

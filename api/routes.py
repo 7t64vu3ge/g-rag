@@ -61,9 +61,50 @@ class SyncResponse(BaseModel):
     chunks_added: int
 
 
+class ConfigResponse(BaseModel):
+    service_account_email: str
+    folder_id: str
+
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+@router.get("/")
+def root():
+    """
+    Root endpoint providing basic instructions.
+    """
+    return {
+        "message": "Welcome to the RAG Backend!",
+        "instructions": (
+            "1. Share your Google Drive folder with the service account email found at /config or /info. "
+            "2. Run /sync-drive to index your documents. "
+            "3. Ask questions using /ask."
+        ),
+        "docs": "/docs"
+    }
+
+
+@router.get("/config", response_model=ConfigResponse)
+@router.get("/info", response_model=ConfigResponse)
+def get_config() -> ConfigResponse:
+    """
+    Return the service account email and target folder ID to help with setup.
+    """
+    import json
+    creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    email = "Unknown"
+    if creds_path and os.path.exists(creds_path):
+        with open(creds_path, "r") as f:
+            data = json.load(f)
+            email = data.get("client_email", "Unknown")
+
+    return ConfigResponse(
+        service_account_email=email,
+        folder_id=os.environ.get("GDRIVE_FOLDER_ID", "Not set")
+    )
+
+
 @router.post("/sync-drive", response_model=SyncResponse)
 def sync_drive() -> SyncResponse:
     """
