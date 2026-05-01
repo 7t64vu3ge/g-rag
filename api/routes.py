@@ -94,10 +94,17 @@ def get_config() -> ConfigResponse:
     import json
     creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
     email = "Unknown"
-    if creds_path and os.path.exists(creds_path):
-        with open(creds_path, "r") as f:
-            data = json.load(f)
-            email = data.get("client_email", "Unknown")
+    if not creds_path:
+        email = "ERROR: GOOGLE_APPLICATION_CREDENTIALS env var not set"
+    elif not os.path.exists(creds_path):
+        email = f"ERROR: File not found at path: {creds_path}"
+    else:
+        try:
+            with open(creds_path, "r") as f:
+                data = json.load(f)
+                email = data.get("client_email", "Unknown")
+        except Exception as e:
+            email = f"ERROR: Could not read JSON: {str(e)}"
 
     return ConfigResponse(
         service_account_email=email,
