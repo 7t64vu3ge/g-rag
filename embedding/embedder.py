@@ -1,8 +1,8 @@
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
 # Load once at module initialisation
-_model = SentenceTransformer("all-MiniLM-L6-v2")
+_model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 
 def embed_texts(texts: list[str]) -> np.ndarray:
